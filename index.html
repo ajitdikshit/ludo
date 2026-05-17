@@ -195,7 +195,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         .play-board {
@@ -270,6 +270,7 @@
             position: relative;
         }
 
+        /* Safe Spot Marker */
         .safe-spot {
             position: relative;
         }
@@ -295,6 +296,66 @@
             letter-spacing: 1px;
             border: 1px solid #bdc3c7;
             overflow: hidden;
+        }
+
+        /* --- Floating Dice Element --- */
+        #active-dice {
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            background: white;
+            border: 3px solid #2c3e50;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            color: #2c3e50;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 50; 
+            transition: transform 0.1s, box-shadow 0.1s, opacity 0.3s;
+        }
+
+        #active-dice:active:not(.disabled) {
+            transform: scale(0.9);
+        }
+
+        #active-dice.disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+            background: #ecf0f1;
+        }
+
+        #active-dice.ready {
+            animation: dicePulse 1.2s infinite;
+        }
+
+        /* --- Physical Dice Dots --- */
+        .dice-dot {
+            width: 20%;
+            height: 20%;
+            background-color: #2c3e50;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: inset 0 2px rgba(0,0,0,0.5);
+        }
+
+        /* --- The Spin Animation --- */
+        @keyframes rollSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(360deg) scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+            100% { transform: rotate(720deg) scale(1); }
+        }
+
+        .rolling-animation {
+            animation: rollSpin 0.4s ease-out !important;
+        }
+
+        @keyframes dicePulse {
+            0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+            100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         }
 
         /* Tokens */
@@ -323,64 +384,14 @@
 
         .playable {
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 10px 4px #2c3e50;
-            animation: pulse 1s infinite;
-            z-index: 20;
+            animation: tokenPulse 1s infinite;
+            z-index: 100 !important; 
         }
 
-        @keyframes pulse {
+        @keyframes tokenPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.15); }
             100% { transform: scale(1); }
-        }
-
-        .game-controls {
-            width: 100%;
-            max-width: 400px;
-            background: #ecf0f1;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 25px; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        #turn-indicator {
-            padding: 10px 15px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            font-size: 1rem;
-        }
-
-        .dice-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #btn-roll {
-            margin: 0;
-            padding: 10px 20px;
-            width: auto;
-            font-size: 1rem;
-        }
-
-        #dice-display {
-            width: 45px;
-            height: 45px;
-            background: white;
-            border: 2px solid #2c3e50;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #2c3e50;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -460,6 +471,8 @@
         <div id="screen-game" class="screen">
             <div class="game-wrapper">
                 
+                <div id="active-dice" class="ready" onclick="window.rollDice()" style="display: none;">🎲</div>
+
                 <div class="play-board">
                     <div class="board-home bg-red">
                         <div class="home-inner">
@@ -498,14 +511,6 @@
                     </div>
                 </div>
 
-                <div class="game-controls">
-                    <div id="turn-indicator" class="bg-red">Turn: RED</div>
-                    <div class="dice-wrapper">
-                        <button id="btn-roll" class="btn primary" onclick="window.rollDice()">Roll</button>
-                        <div id="dice-display">?</div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -517,7 +522,7 @@
             dice: new Audio('dice.mp3'),
             move: new Audio('move.mp3')
         };
-        sounds.move.volume = 0.2; 
+        sounds.move.volume = 0.6; 
 
         function preloadAudio() {
             const startBtn = document.getElementById('btn-main-start');
@@ -545,7 +550,7 @@
         // --- Game State ---
         const gameData = {
             players: [], 
-            roles: {}, // Tracks who is 'player' and who is 'bot'
+            roles: {}, 
             turnIndex: 0,
             diceValue: 0,
             state: 'waiting_for_roll', 
@@ -607,7 +612,7 @@
             else if (numPlayers === 3) gameData.players = ['red', 'green', 'yellow']; 
             else if (numPlayers === 4) gameData.players = ['red', 'green', 'yellow', 'blue']; 
 
-            gameData.players.forEach(c => gameData.roles[c] = 'player'); // All human
+            gameData.players.forEach(c => gameData.roles[c] = 'player'); 
 
             initGameVisuals();
             window.switchScreen('screen-game');
@@ -671,7 +676,11 @@
             gameData.state = 'waiting_for_roll';
             gameData.diceValue = 0;
             
-            document.getElementById('dice-display').innerText = '?';
+            let dice = document.getElementById('active-dice');
+            dice.style.display = 'flex';
+            dice.innerHTML = '🎲';
+            dice.classList.remove('disabled');
+            dice.classList.add('ready');
             
             ['red', 'green', 'yellow', 'blue'].forEach(color => {
                 gameData.tokens[color] = [-1, -1, -1, -1];
@@ -680,38 +689,87 @@
             updateBoardUI(false); 
         }
 
-        // --- Core Turn Interactions ---
+        function renderDiceDots(num) {
+            let html = '';
+            const dot = (t, l, b, r) => `<div class="dice-dot" style="top:${t}; left:${l}; bottom:${b}; right:${r};"></div>`;
+            
+            if (num === 1 || num === 3 || num === 5) html += dot('40%', '40%', 'auto', 'auto'); 
+            if (num !== 1) {
+                html += dot('15%', '15%', 'auto', 'auto'); 
+                html += dot('auto', 'auto', '15%', '15%'); 
+            }
+            if (num >= 4) {
+                html += dot('15%', 'auto', 'auto', '15%'); 
+                html += dot('auto', '15%', '15%', 'auto'); 
+            }
+            if (num === 6) {
+                html += dot('40%', '15%', 'auto', 'auto'); 
+                html += dot('40%', 'auto', 'auto', '15%'); 
+            }
+            return html;
+        }
+
         window.rollDice = function() {
             if (gameData.state !== 'waiting_for_roll') return;
             
+            const curPlayer = gameData.players[gameData.turnIndex];
+            const dice = document.getElementById('active-dice');
+
             gameData.state = 'rolling';
-            document.getElementById('btn-roll').disabled = true; 
+            dice.classList.add('disabled');
+            dice.classList.remove('ready');
             
+            // Start spinning animation
+            dice.classList.add('rolling-animation');
+
             sounds.dice.currentTime = 0;
             sounds.dice.play().catch(e => console.log("Audio blocked", e));
 
-            gameData.diceValue = Math.floor(Math.random() * 6) + 1;
-            document.getElementById('dice-display').innerText = gameData.diceValue;
-            
-            const color = gameData.players[gameData.turnIndex];
-            const isBot = gameData.roles[color] === 'bot';
-            
-            const canMoveAny = gameData.tokens[color].some(pos => checkValidMove(pos, gameData.diceValue));
+            // Wait exactly 400ms for the spin animation to finish
+            setTimeout(() => {
+                dice.classList.remove('rolling-animation'); // Remove spin class
+                
+                gameData.diceValue = Math.floor(Math.random() * 6) + 1;
+                dice.innerHTML = renderDiceDots(gameData.diceValue);
+                
+                // Find all valid moves for the current player
+                let validMoves = [];
+                gameData.tokens[curPlayer].forEach((pos, idx) => {
+                    if (checkValidMove(pos, gameData.diceValue)) {
+                        validMoves.push(idx);
+                    }
+                });
 
-            if (!canMoveAny) {
-                setTimeout(nextTurn, 1000);
-            } else {
-                gameData.state = 'waiting_for_move';
-                updateBoardUI(false); 
+                if (validMoves.length === 0) {
+                    // Turn skipped (no valid moves)
+                    setTimeout(nextTurn, 1000);
+                } else {
+                    gameData.state = 'waiting_for_move';
+                    updateBoardUI(false); 
 
-                // If it is a bot, trigger the AI file!
-                if (isBot) {
-                    setTimeout(() => {
-                        const bestIdx = LudoBot.getBestMove(gameData, color, gameData.diceValue, safeSpots, startOffsets);
-                        if (bestIdx !== -1) handleTokenClick(color, bestIdx, true);
-                    }, 1200); // 1.2s delay simulates "thinking"
+                    if (gameData.roles[curPlayer] === 'bot') {
+                        // Bot Logic
+                        setTimeout(() => {
+                            if (typeof LudoBot !== 'undefined') {
+                                const bestIdx = LudoBot.getBestMove(gameData, curPlayer, gameData.diceValue, safeSpots, startOffsets);
+                                if (bestIdx !== -1) handleTokenClick(curPlayer, bestIdx, true);
+                            } else {
+                                handleTokenClick(curPlayer, validMoves[0], true);
+                            }
+                        }, 1200); 
+                    } else {
+                        // Human Player Logic
+                        if (validMoves.length === 1) {
+                            // AUTO-MOVE! Only 1 piece can move, so save the player a click.
+                            // Wait 0.5s so they can visually register the dice number first
+                            setTimeout(() => {
+                                handleTokenClick(curPlayer, validMoves[0]);
+                            }, 500);
+                        }
+                        // If length > 1, the game safely waits for the human to click their choice
+                    }
                 }
-            }
+            }, 400); // 400ms timeout matches CSS spin animation duration
         };
 
         function checkValidMove(currentPos, dice) {
@@ -724,7 +782,6 @@
             if (gameData.state !== 'waiting_for_move') return;
             if (color !== gameData.players[gameData.turnIndex]) return;
 
-            // Block humans from clicking the bot's pieces
             if (gameData.roles[color] === 'bot' && !isBotBypass) return;
 
             let currentPos = gameData.tokens[color][tokenIndex];
@@ -808,14 +865,16 @@
         function endTurnLogic() {
             if (gameData.diceValue === 6) {
                 gameData.state = 'waiting_for_roll';
-                
-                // If bot gets a 6, automatically roll again
                 const curPlayer = gameData.players[gameData.turnIndex];
+                const dice = document.getElementById('active-dice');
+
                 if (gameData.roles[curPlayer] === 'bot') {
+                    dice.innerHTML = '🤖';
                     setTimeout(() => window.rollDice(), 1000);
                 } else {
-                    document.getElementById('btn-roll').disabled = false;
-                    document.getElementById('dice-display').innerText = 'Roll';
+                    dice.innerHTML = '🎲';
+                    dice.classList.remove('disabled');
+                    dice.classList.add('ready');
                 }
             } else {
                 nextTurn();
@@ -825,8 +884,6 @@
         function nextTurn() {
             gameData.turnIndex = (gameData.turnIndex + 1) % gameData.players.length;
             gameData.state = 'waiting_for_roll';
-            
-            document.getElementById('dice-display').innerText = '?';
             updateTurnIndicator();
         }
 
@@ -834,10 +891,6 @@
             if (!gameData.players.length) return;
             const curPlayer = gameData.players[gameData.turnIndex];
             const isBot = gameData.roles[curPlayer] === 'bot';
-            
-            const indicator = document.getElementById('turn-indicator');
-            indicator.innerText = `Turn: ${curPlayer.toUpperCase()}`;
-            indicator.className = `bg-${curPlayer}`;
 
             const hexColors = {
                 'red': '#e74c3c', 'green': '#2ecc71',
@@ -847,17 +900,26 @@
             document.body.style.backgroundColor = hexColors[curPlayer];
             document.querySelector('.game-container').style.backgroundColor = hexColors[curPlayer];
 
-            // Bot Auto-Play Logic trigger
-            const btnRoll = document.getElementById('btn-roll');
+            let dice = document.getElementById('active-dice');
+            const activeHome = document.querySelector(`.board-home.bg-${curPlayer}`);
+            
+            if(activeHome && dice) {
+                activeHome.appendChild(dice); 
+            }
+
             if (isBot) {
-                btnRoll.disabled = true;
-                btnRoll.innerText = 'Bot...';
-                setTimeout(() => {
-                    if (gameData.state === 'waiting_for_roll') window.rollDice();
-                }, 1000);
+                dice.classList.add('disabled');
+                dice.classList.remove('ready');
+                if (gameData.state === 'waiting_for_roll') {
+                    dice.innerHTML = '🤖';
+                    setTimeout(() => window.rollDice(), 1000);
+                }
             } else {
-                btnRoll.disabled = false;
-                btnRoll.innerText = 'Roll';
+                dice.classList.remove('disabled');
+                dice.classList.add('ready');
+                if (gameData.state === 'waiting_for_roll') {
+                    dice.innerHTML = '🎲';
+                }
             }
         }
 
@@ -873,7 +935,6 @@
                         token.onclick = () => handleTokenClick(color, idx);
                     }
 
-                    // Only humans get the pulse indicator
                     const canMove = checkValidMove(pos, gameData.diceValue);
                     const isHuman = gameData.roles[color] === 'player';
                     if (gameData.state === 'waiting_for_move' && color === gameData.players[gameData.turnIndex] && canMove && isHuman) {
@@ -923,6 +984,7 @@
                     }
                 });
             });
+            updateTurnIndicator(); 
         }
 
         window.addEventListener('DOMContentLoaded', () => {
