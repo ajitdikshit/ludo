@@ -7,392 +7,80 @@
     <script src="bots.js"></script>
     <style>
         /* --- CSS STYLING --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; transition: background-color 0.5s ease; }
+        .game-container { background: white; width: 100%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; transition: background-color 0.5s ease; }
+        @media (min-width: 600px) { .game-container { max-width: 500px; height: 800px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); } }
 
-        body {
-            background-color: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            transition: background-color 0.5s ease; 
-        }
+        .screen { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 5%; text-align: center; }
+        .screen.active { display: flex; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .game-container {
-            background: white;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            transition: background-color 0.5s ease; 
-        }
+        h1 { font-size: clamp(3rem, 10vw, 4.5rem); color: #2c3e50; margin-bottom: 30px; letter-spacing: 5px; }
+        h2 { font-size: clamp(1.5rem, 5vw, 2rem); color: #34495e; margin-bottom: 15px; }
+        .subtitle { color: #7f8c8d; margin-bottom: 20px; font-size: clamp(0.85rem, 3vw, 1rem); padding: 0 10px; }
 
-        @media (min-width: 600px) {
-            .game-container {
-                max-width: 500px;
-                height: 800px;
-                border-radius: 20px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            }
-        }
-
-        .screen {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding: 5%;
-            text-align: center;
-        }
-
-        .screen.active {
-            display: flex;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            font-size: clamp(3rem, 10vw, 4.5rem);
-            color: #2c3e50;
-            margin-bottom: 30px;
-            letter-spacing: 5px;
-        }
-
-        h2 {
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            color: #34495e;
-            margin-bottom: 15px;
-        }
-
-        .subtitle {
-            color: #7f8c8d;
-            margin-bottom: 20px;
-            font-size: clamp(0.85rem, 3vw, 1rem);
-            padding: 0 10px;
-        }
-
-        .btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            margin: 8px 0;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            width: 100%;
-            max-width: 280px;
-        }
-
+        .btn { background-color: #3498db; color: white; border: none; padding: 15px 20px; margin: 8px 0; border-radius: 12px; font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.1s; width: 100%; max-width: 280px; }
         .btn:hover { background-color: #2980b9; }
         .btn:active { transform: scale(0.96); }
-
-        .btn.primary {
-            background-color: #2ecc71;
-            font-weight: bold;
-            font-size: 1.2rem;
-            padding: 18px 20px;
-        }
+        .btn.primary { background-color: #2ecc71; font-weight: bold; font-size: 1.2rem; padding: 18px 20px; }
         .btn.primary:hover { background-color: #27ae60; }
         .btn.secondary { background-color: #95a5a6; }
         .btn.secondary:hover { background-color: #7f8c8d; }
+        .btn:disabled { background-color: #95a5a6 !important; cursor: not-allowed; transform: none !important; }
 
-        .btn:disabled {
-            background-color: #95a5a6 !important;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 350px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
+        .button-group { display: flex; flex-direction: column; width: 100%; align-items: center; margin-bottom: 20px; }
+        .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 350px; justify-content: center; margin-top: 15px; }
         .action-buttons .btn { margin: 0; flex: 1; }
 
-        .menu-board {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 10px;
-            width: 100%;
-            max-width: 360px;
-            aspect-ratio: 1 / 1;
-            background: #bdc3c7;
-            padding: 10px;
-            border-radius: 15px;
-            position: relative;
-            margin-bottom: 20px;
-        }
+        .menu-board { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; aspect-ratio: 1 / 1; background: #bdc3c7; padding: 10px; border-radius: 15px; position: relative; margin-bottom: 20px; }
+        .corner { display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; padding: 10px; color: white; }
+        .corner h3 { margin-bottom: 8px; font-size: clamp(1rem, 4vw, 1.3rem); text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .role-select { padding: 8px 5px; border-radius: 8px; border: none; outline: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; width: 100%; max-width: 100px; text-align: center; background-color: rgba(255, 255, 255, 0.9); }
 
-        .corner {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            padding: 10px;
-            color: white;
-        }
+        .bg-red { background-color: #e74c3c !important; } .bg-green { background-color: #2ecc71 !important; } .bg-blue { background-color: #3498db !important; } .bg-yellow { background-color: #f1c40f !important; color: #333 !important; } .bg-yellow h3 { text-shadow: none; }
 
-        .corner h3 {
-            margin-bottom: 8px;
-            font-size: clamp(1rem, 4vw, 1.3rem);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
+        .game-wrapper { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; position: relative; margin-top: 20px; }
+        .player-label { font-weight: bold; font-size: 0.9rem; padding: 5px 12px; border-radius: 20px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); margin: 5px 0; display: none; width: fit-content; transition: all 0.3s; }
+        .top-labels, .bottom-labels { display: flex; justify-content: space-between; width: 100%; padding: 0 10px; margin-bottom: 5px; margin-top: 5px; }
 
-        .role-select {
-            padding: 8px 5px;
-            border-radius: 8px;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9rem;
-            width: 100%;
-            max-width: 100px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
+        .play-board { display: grid; grid-template-columns: 40% 20% 40%; grid-template-rows: 40% 20% 40%; width: 100%; aspect-ratio: 1 / 1; background: white; border: 2px solid #2c3e50; border-radius: 5px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .board-home { display: flex; justify-content: center; align-items: center; padding: 15%; border: 1px solid #bdc3c7; position: relative; }
+        .home-inner { background: white; width: 100%; height: 100%; border-radius: 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10%; padding: 10%; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+        .token-spot { background-color: rgba(0,0,0,0.05); border-radius: 50%; width: 100%; height: 100%; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2); display: flex; justify-content: center; align-items: center; }
 
-        .bg-red { background-color: #e74c3c !important; }
-        .bg-green { background-color: #2ecc71 !important; }
-        .bg-blue { background-color: #3498db !important; }
-        .bg-yellow { background-color: #f1c40f !important; color: #333 !important; }
-        .bg-yellow h3 { text-shadow: none; }
+        .path { display: grid; background: #ecf0f1; border: 1px solid #bdc3c7; }
+        .path.vertical { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6, 1fr); }
+        .path.horizontal { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); }
+        .path-cell { border: 1px solid #bdc3c7; background: white; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; position: relative; }
 
-        .game-wrapper {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            margin-top: 20px;
-        }
+        .safe-spot { position: relative; }
+        .safe-spot::before { content: "★"; position: absolute; font-size: 1.5rem; color: rgba(0,0,0,0.15); z-index: 1; }
+        .center-finish { position: relative; background: #34495e; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; color: white; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; border: 1px solid #bdc3c7; overflow: hidden; }
 
-        .play-board {
-            display: grid;
-            grid-template-columns: 40% 20% 40%;
-            grid-template-rows: 40% 20% 40%;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: white;
-            border: 2px solid #2c3e50;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-        }
-
-        .board-home {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15%;
-            border: 1px solid #bdc3c7;
-            position: relative;
-        }
-
-        .home-inner {
-            background: white;
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 10%;
-            padding: 10%;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-        }
-
-        .token-spot {
-            background-color: rgba(0,0,0,0.05);
-            border-radius: 50%;
-            width: 100%;
-            height: 100%;
-            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .path {
-            display: grid;
-            background: #ecf0f1;
-            border: 1px solid #bdc3c7;
-        }
-
-        .path.vertical {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-        }
-
-        .path.horizontal {
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-        }
-
-        .path-cell {
-            border: 1px solid #bdc3c7;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap; 
-            position: relative;
-        }
-
-        /* Safe Spot Marker */
-        .safe-spot {
-            position: relative;
-        }
-
-        .safe-spot::before {
-            content: "★";
-            position: absolute;
-            font-size: 1.5rem;
-            color: rgba(0,0,0,0.15);
-            z-index: 1; 
-        }
-
-        .center-finish {
-            position: relative;
-            background: #34495e;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border: 1px solid #bdc3c7;
-            overflow: hidden;
-        }
-
-        /* --- Floating Dice Element --- */
-        #active-dice {
-            position: absolute;
-            width: 40%;
-            height: 40%;
-            background: white;
-            border: 3px solid #2c3e50;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.2rem;
-            color: #2c3e50;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 50; 
-            transition: transform 0.1s, box-shadow 0.1s, opacity 0.3s;
-        }
-
-        #active-dice:active:not(.disabled) {
-            transform: scale(0.9);
-        }
-
-        #active-dice.disabled {
-            cursor: not-allowed;
-            opacity: 0.9;
-            background: #ecf0f1;
-        }
-
-        #active-dice.ready {
-            animation: dicePulse 1.2s infinite;
-        }
-
-        /* --- Physical Dice Dots --- */
-        .dice-dot {
-            width: 20%;
-            height: 20%;
-            background-color: #2c3e50;
-            border-radius: 50%;
-            position: absolute;
-            box-shadow: inset 0 2px rgba(0,0,0,0.5);
-        }
-
-        /* --- The Spin Animation --- */
-        @keyframes rollSpin {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(360deg) scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-            100% { transform: rotate(720deg) scale(1); }
-        }
-
-        .rolling-animation {
-            animation: rollSpin 0.4s ease-out !important;
-        }
-
-        @keyframes dicePulse {
-            0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-            50% { transform: scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-            100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        }
+        /* Floating Dice Element */
+        #active-dice { position: absolute; width: 40%; height: 40%; background: white; border: 3px solid #2c3e50; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; color: #2c3e50; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 50; transition: transform 0.1s, box-shadow 0.1s, opacity 0.3s; }
+        #active-dice:active:not(.disabled) { transform: scale(0.9); }
+        #active-dice.disabled { cursor: not-allowed; opacity: 0.9; background: #ecf0f1; }
+        #active-dice.ready { animation: dicePulse 1.2s infinite; }
+        .dice-dot { width: 20%; height: 20%; background-color: #2c3e50; border-radius: 50%; position: absolute; box-shadow: inset 0 2px rgba(0,0,0,0.5); }
+        
+        @keyframes rollSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(360deg) scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.4); } 100% { transform: rotate(720deg) scale(1); } }
+        .rolling-animation { animation: rollSpin 0.4s ease-out !important; }
+        @keyframes dicePulse { 0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); } 50% { transform: scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.5); } 100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); } }
 
         /* Tokens */
-        .ludo-token {
-            width: 65%;
-            height: 65%;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            cursor: pointer;
-            z-index: 10;
-        }
+        .ludo-token { width: 65%; height: 65%; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; z-index: 10; }
+        .path-cell .ludo-token { width: 14px; height: 14px; margin: 1px; border-width: 1px; }
+        .center-finish .ludo-token { width: 15px; height: 15px; margin: 2px; }
+        .playable { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 10px 4px #2c3e50; animation: tokenPulse 1s infinite; z-index: 100 !important; }
+        @keyframes tokenPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
-        .path-cell .ludo-token {
-            width: 14px;
-            height: 14px;
-            margin: 1px;
-            border-width: 1px;
-        }
-
-        .center-finish .ludo-token {
-            width: 15px;
-            height: 15px;
-            margin: 2px;
-        }
-
-        .playable {
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 10px 4px #2c3e50;
-            animation: tokenPulse 1s infinite;
-            z-index: 100 !important; 
-        }
-
-        @keyframes tokenPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
+        /* --- Victory Overlay Modal --- */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.85); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn 0.3s ease-in-out; }
+        .modal-box { background: white; padding: 30px; border-radius: 15px; text-align: center; width: 85%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-box h2 { font-size: 2rem; color: #2ecc71; margin-bottom: 10px; }
+        .modal-box p { font-size: 1.1rem; color: #34495e; margin-bottom: 25px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -426,42 +114,12 @@
         <div id="screen-board" class="screen">
             <h2>Assign Roles</h2>
             <p class="subtitle">Select who plays which color.</p>
-            
             <div class="menu-board">
-                <div class="corner bg-red">
-                    <h3>Red</h3>
-                    <select id="role-red" class="role-select">
-                        <option value="player">Player</option>
-                        <option value="bot">Bot</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div class="corner bg-green">
-                    <h3>Green</h3>
-                    <select id="role-green" class="role-select">
-                        <option value="bot">Bot</option>
-                        <option value="player">Player</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div class="corner bg-blue">
-                    <h3>Blue</h3>
-                    <select id="role-blue" class="role-select">
-                        <option value="none" selected>None</option>
-                        <option value="player">Player</option>
-                        <option value="bot">Bot</option>
-                    </select>
-                </div>
-                <div class="corner bg-yellow">
-                    <h3>Yellow</h3>
-                    <select id="role-yellow" class="role-select">
-                        <option value="bot">Bot</option>
-                        <option value="player">Player</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
+                <div class="corner bg-red"><h3>Red</h3><select id="role-red" class="role-select"><option value="player">Player</option><option value="bot">Bot</option><option value="none">None</option></select></div>
+                <div class="corner bg-green"><h3>Green</h3><select id="role-green" class="role-select"><option value="bot">Bot</option><option value="player">Player</option><option value="none">None</option></select></div>
+                <div class="corner bg-blue"><h3>Blue</h3><select id="role-blue" class="role-select"><option value="none" selected>None</option><option value="player">Player</option><option value="bot">Bot</option></select></div>
+                <div class="corner bg-yellow"><h3>Yellow</h3><select id="role-yellow" class="role-select"><option value="bot">Bot</option><option value="player">Player</option><option value="none">None</option></select></div>
             </div>
-
             <div class="action-buttons">
                 <button class="btn secondary" onclick="window.switchScreen('screen-mode')">Back</button>
                 <button class="btn primary" onclick="window.startBotGame()">Begin Match</button>
@@ -471,46 +129,42 @@
         <div id="screen-game" class="screen">
             <div class="game-wrapper">
                 
+                <div class="top-labels">
+                    <div id="label-red" class="player-label bg-red">P1</div>
+                    <div id="label-green" class="player-label bg-green">P2</div>
+                </div>
+
                 <div id="active-dice" class="ready" onclick="window.rollDice()" style="display: none;">🎲</div>
 
                 <div class="play-board">
-                    <div class="board-home bg-red">
-                        <div class="home-inner">
-                            <div class="token-spot" id="home-red-0"></div><div class="token-spot" id="home-red-1"></div>
-                            <div class="token-spot" id="home-red-2"></div><div class="token-spot" id="home-red-3"></div>
-                        </div>
-                    </div>
-                    
+                    <div class="board-home bg-red"><div class="home-inner"><div class="token-spot" id="home-red-0"></div><div class="token-spot" id="home-red-1"></div><div class="token-spot" id="home-red-2"></div><div class="token-spot" id="home-red-3"></div></div></div>
                     <div id="path-top" class="path vertical"></div>
-                    
-                    <div class="board-home bg-green">
-                        <div class="home-inner">
-                            <div class="token-spot" id="home-green-0"></div><div class="token-spot" id="home-green-1"></div>
-                            <div class="token-spot" id="home-green-2"></div><div class="token-spot" id="home-green-3"></div>
-                        </div>
-                    </div>
-                    
+                    <div class="board-home bg-green"><div class="home-inner"><div class="token-spot" id="home-green-0"></div><div class="token-spot" id="home-green-1"></div><div class="token-spot" id="home-green-2"></div><div class="token-spot" id="home-green-3"></div></div></div>
                     <div id="path-left" class="path horizontal"></div>
                     <div class="center-finish" id="center-home">HOME</div>
                     <div id="path-right" class="path horizontal"></div>
-                    
-                    <div class="board-home bg-blue">
-                        <div class="home-inner">
-                            <div class="token-spot" id="home-blue-0"></div><div class="token-spot" id="home-blue-1"></div>
-                            <div class="token-spot" id="home-blue-2"></div><div class="token-spot" id="home-blue-3"></div>
-                        </div>
-                    </div>
-                    
+                    <div class="board-home bg-blue"><div class="home-inner"><div class="token-spot" id="home-blue-0"></div><div class="token-spot" id="home-blue-1"></div><div class="token-spot" id="home-blue-2"></div><div class="token-spot" id="home-blue-3"></div></div></div>
                     <div id="path-bottom" class="path vertical"></div>
-                    
-                    <div class="board-home bg-yellow">
-                        <div class="home-inner">
-                            <div class="token-spot" id="home-yellow-0"></div><div class="token-spot" id="home-yellow-1"></div>
-                            <div class="token-spot" id="home-yellow-2"></div><div class="token-spot" id="home-yellow-3"></div>
-                        </div>
-                    </div>
+                    <div class="board-home bg-yellow"><div class="home-inner"><div class="token-spot" id="home-yellow-0"></div><div class="token-spot" id="home-yellow-1"></div><div class="token-spot" id="home-yellow-2"></div><div class="token-spot" id="home-yellow-3"></div></div></div>
                 </div>
 
+                <div class="bottom-labels">
+                    <div id="label-blue" class="player-label bg-blue">P4</div>
+                    <div id="label-yellow" class="player-label bg-yellow">P3</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="win-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h2>Congratulations!</h2>
+                <p id="win-text">Red has finished 1st!</p>
+                <div class="button-group">
+                    <button id="btn-continue" class="btn primary" onclick="window.continueGame()">Continue Match</button>
+                    <button class="btn" onclick="window.switchScreen('screen-mode')">New Game</button>
+                    <button class="btn secondary" onclick="window.switchScreen('screen-main')">Exit to Menu</button>
+                </div>
             </div>
         </div>
 
@@ -520,9 +174,13 @@
         // --- AUDIO PRELOADER ---
         const sounds = {
             dice: new Audio('dice.mp3'),
-            move: new Audio('move.mp3')
+            move: new Audio('move.mp3'),
+            win: new Audio('win.mp3'),
+            safe: new Audio('safe.mp3') // NEW SAFE SOUND ADDED
         };
-        sounds.move.volume = 0.6; 
+        sounds.dice.volume = 1.0;
+        sounds.move.volume = 0.1; 
+        sounds.safe.volume = 0.1; // Tweak this if it is too loud/quiet compared to move.mp3
 
         function preloadAudio() {
             const startBtn = document.getElementById('btn-main-start');
@@ -551,6 +209,7 @@
         const gameData = {
             players: [], 
             roles: {}, 
+            winners: [], 
             turnIndex: 0,
             diceValue: 0,
             state: 'waiting_for_roll', 
@@ -575,29 +234,17 @@
             if (screenId !== 'screen-game') {
                 document.body.style.backgroundColor = '#f0f4f8';
                 document.querySelector('.game-container').style.backgroundColor = 'white';
+                document.getElementById('win-modal').style.display = 'none';
             }
         };
 
         window.startBotGame = function() {
-            const roles = {
-                red: document.getElementById('role-red').value,
-                green: document.getElementById('role-green').value,
-                yellow: document.getElementById('role-yellow').value,
-                blue: document.getElementById('role-blue').value
-            };
+            const roles = { red: document.getElementById('role-red').value, green: document.getElementById('role-green').value, yellow: document.getElementById('role-yellow').value, blue: document.getElementById('role-blue').value };
+            if (Object.values(roles).indexOf('player') === -1) { alert("At least one slot must be a Player!"); return; }
 
-            if (Object.values(roles).indexOf('player') === -1) {
-                alert("At least one slot must be a Player!"); return;
-            }
-
-            gameData.players = [];
-            gameData.roles = {};
-
+            gameData.players = []; gameData.roles = {};
             ['red', 'green', 'yellow', 'blue'].forEach(color => {
-                if (roles[color] !== 'none') {
-                    gameData.players.push(color); 
-                    gameData.roles[color] = roles[color];
-                }
+                if (roles[color] !== 'none') { gameData.players.push(color); gameData.roles[color] = roles[color]; }
             });
 
             initGameVisuals();
@@ -605,9 +252,7 @@
         };
 
         window.startNoBotGame = function(numPlayers) {
-            gameData.players = [];
-            gameData.roles = {};
-
+            gameData.players = []; gameData.roles = {};
             if (numPlayers === 2) gameData.players = ['red', 'yellow']; 
             else if (numPlayers === 3) gameData.players = ['red', 'green', 'yellow']; 
             else if (numPlayers === 4) gameData.players = ['red', 'green', 'yellow', 'blue']; 
@@ -621,16 +266,11 @@
         function generatePaths() {
             const blocks = ['path-top', 'path-left', 'path-right', 'path-bottom'];
             const prefixes = ['T', 'L', 'R', 'B'];
-
             blocks.forEach((id, index) => {
                 const container = document.getElementById(id);
-                if (!container) return; 
-                container.innerHTML = ''; 
+                if (!container) return; container.innerHTML = ''; 
                 for(let i=0; i < 18; i++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'path-cell';
-                    cell.id = `${prefixes[index]}-${i}`;
-                    container.appendChild(cell);
+                    const cell = document.createElement('div'); cell.className = 'path-cell'; cell.id = `${prefixes[index]}-${i}`; container.appendChild(cell);
                 }
             });
         }
@@ -647,25 +287,13 @@
                 get('B-16'), get('B-15'), get('B-12'), get('B-9'), get('B-6'), get('B-3'), get('B-0'),
                 get('L-17'), get('L-16'), get('L-15'), get('L-14'), get('L-13'), get('L-12'), get('L-6')
             ];
-
             stretches.red = [get('L-7'), get('L-8'), get('L-9'), get('L-10'), get('L-11')];
             stretches.green = [get('T-4'), get('T-7'), get('T-10'), get('T-13'), get('T-16')];
             stretches.yellow = [get('R-10'), get('R-9'), get('R-8'), get('R-7'), get('R-6')];
             stretches.blue = [get('B-13'), get('B-10'), get('B-7'), get('B-4'), get('B-1')];
 
-            const safeZones = [
-                { index: 1, color: '#fadbd8' }, { index: 9, color: '#fadbd8' },   
-                { index: 14, color: '#d5f5e3' }, { index: 22, color: '#d5f5e3' }, 
-                { index: 27, color: '#fcf3cf' }, { index: 35, color: '#fcf3cf' }, 
-                { index: 40, color: '#d6eaf8' }, { index: 48, color: '#d6eaf8' }  
-            ];
-
-            safeZones.forEach(zone => {
-                if (mainTrack[zone.index]) {
-                    mainTrack[zone.index].style.backgroundColor = zone.color;
-                    mainTrack[zone.index].classList.add('safe-spot');
-                }
-            });
+            const safeZones = [{ index: 1, color: '#fadbd8' }, { index: 9, color: '#fadbd8' }, { index: 14, color: '#d5f5e3' }, { index: 22, color: '#d5f5e3' }, { index: 27, color: '#fcf3cf' }, { index: 35, color: '#fcf3cf' }, { index: 40, color: '#d6eaf8' }, { index: 48, color: '#d6eaf8' }];
+            safeZones.forEach(zone => { if (mainTrack[zone.index]) { mainTrack[zone.index].style.backgroundColor = zone.color; mainTrack[zone.index].classList.add('safe-spot'); } });
         }
 
         function initGameVisuals() {
@@ -675,6 +303,7 @@
             gameData.turnIndex = 0;
             gameData.state = 'waiting_for_roll';
             gameData.diceValue = 0;
+            gameData.winners = []; 
             
             let dice = document.getElementById('active-dice');
             dice.style.display = 'flex';
@@ -684,6 +313,13 @@
             
             ['red', 'green', 'yellow', 'blue'].forEach(color => {
                 gameData.tokens[color] = [-1, -1, -1, -1];
+                document.getElementById(`label-${color}`).style.display = 'none'; 
+            });
+
+            gameData.players.forEach((c, idx) => {
+                const lbl = document.getElementById(`label-${c}`);
+                lbl.style.display = 'block';
+                lbl.innerText = gameData.roles[c] === 'bot' ? `Bot ${idx+1}` : `Player ${idx+1}`;
             });
 
             updateBoardUI(false); 
@@ -692,20 +328,10 @@
         function renderDiceDots(num) {
             let html = '';
             const dot = (t, l, b, r) => `<div class="dice-dot" style="top:${t}; left:${l}; bottom:${b}; right:${r};"></div>`;
-            
             if (num === 1 || num === 3 || num === 5) html += dot('40%', '40%', 'auto', 'auto'); 
-            if (num !== 1) {
-                html += dot('15%', '15%', 'auto', 'auto'); 
-                html += dot('auto', 'auto', '15%', '15%'); 
-            }
-            if (num >= 4) {
-                html += dot('15%', 'auto', 'auto', '15%'); 
-                html += dot('auto', '15%', '15%', 'auto'); 
-            }
-            if (num === 6) {
-                html += dot('40%', '15%', 'auto', 'auto'); 
-                html += dot('40%', 'auto', 'auto', '15%'); 
-            }
+            if (num !== 1) { html += dot('15%', '15%', 'auto', 'auto'); html += dot('auto', 'auto', '15%', '15%'); }
+            if (num >= 4) { html += dot('15%', 'auto', 'auto', '15%'); html += dot('auto', '15%', '15%', 'auto'); }
+            if (num === 6) { html += dot('40%', '15%', 'auto', 'auto'); html += dot('40%', 'auto', 'auto', '15%'); }
             return html;
         }
 
@@ -718,37 +344,29 @@
             gameData.state = 'rolling';
             dice.classList.add('disabled');
             dice.classList.remove('ready');
-            
-            // Start spinning animation
             dice.classList.add('rolling-animation');
 
             sounds.dice.currentTime = 0;
-            sounds.dice.play().catch(e => console.log("Audio blocked", e));
+            sounds.dice.play().catch(e => {});
 
-            // Wait exactly 400ms for the spin animation to finish
             setTimeout(() => {
-                dice.classList.remove('rolling-animation'); // Remove spin class
+                dice.classList.remove('rolling-animation'); 
                 
                 gameData.diceValue = Math.floor(Math.random() * 6) + 1;
                 dice.innerHTML = renderDiceDots(gameData.diceValue);
                 
-                // Find all valid moves for the current player
                 let validMoves = [];
                 gameData.tokens[curPlayer].forEach((pos, idx) => {
-                    if (checkValidMove(pos, gameData.diceValue)) {
-                        validMoves.push(idx);
-                    }
+                    if (checkValidMove(pos, gameData.diceValue)) validMoves.push(idx);
                 });
 
                 if (validMoves.length === 0) {
-                    // Turn skipped (no valid moves)
                     setTimeout(nextTurn, 1000);
                 } else {
                     gameData.state = 'waiting_for_move';
                     updateBoardUI(false); 
 
                     if (gameData.roles[curPlayer] === 'bot') {
-                        // Bot Logic
                         setTimeout(() => {
                             if (typeof LudoBot !== 'undefined') {
                                 const bestIdx = LudoBot.getBestMove(gameData, curPlayer, gameData.diceValue, safeSpots, startOffsets);
@@ -758,18 +376,12 @@
                             }
                         }, 1200); 
                     } else {
-                        // Human Player Logic
                         if (validMoves.length === 1) {
-                            // AUTO-MOVE! Only 1 piece can move, so save the player a click.
-                            // Wait 0.5s so they can visually register the dice number first
-                            setTimeout(() => {
-                                handleTokenClick(curPlayer, validMoves[0]);
-                            }, 500);
+                            setTimeout(() => { handleTokenClick(curPlayer, validMoves[0]); }, 500);
                         }
-                        // If length > 1, the game safely waits for the human to click their choice
                     }
                 }
-            }, 400); // 400ms timeout matches CSS spin animation duration
+            }, 400); 
         };
 
         function checkValidMove(currentPos, dice) {
@@ -781,7 +393,6 @@
         function handleTokenClick(color, tokenIndex, isBotBypass = false) {
             if (gameData.state !== 'waiting_for_move') return;
             if (color !== gameData.players[gameData.turnIndex]) return;
-
             if (gameData.roles[color] === 'bot' && !isBotBypass) return;
 
             let currentPos = gameData.tokens[color][tokenIndex];
@@ -791,28 +402,16 @@
             updateBoardUI(false); 
 
             if (currentPos === -1) {
-                sounds.move.currentTime = 0;
-                sounds.move.play().catch(e => {});
-
                 gameData.tokens[color][tokenIndex] = 0; 
                 updateBoardUI(true);
                 setTimeout(() => finalizeMove(color, tokenIndex), 300);
             } else {
                 let stepsLeft = gameData.diceValue;
-
                 function step() {
-                    if (stepsLeft === 0) {
-                        finalizeMove(color, tokenIndex);
-                        return;
-                    }
-                    
-                    sounds.move.currentTime = 0;
-                    sounds.move.play().catch(e => {});
-
-                    gameData.tokens[color][tokenIndex]++;
-                    stepsLeft--;
+                    if (stepsLeft === 0) { finalizeMove(color, tokenIndex); return; }
+                    sounds.move.currentTime = 0; sounds.move.play().catch(e => {});
+                    gameData.tokens[color][tokenIndex]++; stepsLeft--;
                     updateBoardUI(true); 
-                    
                     setTimeout(step, 200); 
                 }
                 step();
@@ -822,20 +421,15 @@
         function getCaptures(activeColor, activeTokenIndex) {
             let relativePos = gameData.tokens[activeColor][activeTokenIndex];
             if (relativePos < 0 || relativePos > 50) return []; 
-
             let absPos = (startOffsets[activeColor] + relativePos) % 52;
             if (safeSpots.includes(absPos)) return [];
 
             let captures = [];
             ['red', 'green', 'yellow', 'blue'].forEach(otherColor => {
                 if (otherColor === activeColor) return; 
-                
                 gameData.tokens[otherColor].forEach((otherPos, otherIdx) => {
                     if (otherPos >= 0 && otherPos <= 50) {
-                        let otherAbsPos = (startOffsets[otherColor] + otherPos) % 52;
-                        if (absPos === otherAbsPos) {
-                            captures.push({ color: otherColor, index: otherIdx });
-                        }
+                        if (absPos === (startOffsets[otherColor] + otherPos) % 52) captures.push({ color: otherColor, index: otherIdx });
                     }
                 });
             });
@@ -847,20 +441,61 @@
             
             if (captures.length > 0) {
                 setTimeout(() => {
-                    captures.forEach(c => {
-                        gameData.tokens[c.color][c.index] = -1; 
-                    });
-                    
-                    sounds.move.currentTime = 0;
-                    sounds.move.play().catch(e => {});
-                    
+                    captures.forEach(c => gameData.tokens[c.color][c.index] = -1);
+                    sounds.move.currentTime = 0; sounds.move.play().catch(e => {});
                     updateBoardUI(true); 
-                    setTimeout(endTurnLogic, 600); 
+                    setTimeout(() => checkWinCondition(color), 600); 
                 }, 200);
+            } else {
+                // If no capture, check if they landed on a safe spot on the main track
+                let relativePos = gameData.tokens[color][tokenIndex];
+                if (relativePos >= 0 && relativePos <= 50) {
+                    let absPos = (startOffsets[color] + relativePos) % 52;
+                    if (safeSpots.includes(absPos)) {
+                        sounds.safe.currentTime = 0; 
+                        sounds.safe.play().catch(e => {});
+                    }
+                }
+                checkWinCondition(color);
+            }
+        }
+
+        function checkWinCondition(color) {
+            const hasWon = gameData.tokens[color].every(pos => pos === 56);
+            
+            if (hasWon && !gameData.winners.includes(color)) {
+                gameData.winners.push(color);
+                
+                sounds.win.currentTime = 0;
+                sounds.win.play().catch(e => console.log("Audio Blocked"));
+
+                const rank = gameData.winners.length;
+                let rankSuffix = rank === 1 ? "1st" : rank === 2 ? "2nd" : "3rd";
+                
+                const lbl = document.getElementById(`label-${color}`);
+                lbl.innerText += ` 🥇 ${rankSuffix}`;
+
+                const modal = document.getElementById('win-modal');
+                document.getElementById('win-text').innerText = `${color.toUpperCase()} has finished ${rankSuffix}!`;
+                
+                const playersRemaining = gameData.players.length - gameData.winners.length;
+                if (playersRemaining <= 1) {
+                    document.getElementById('btn-continue').style.display = 'none'; 
+                    document.getElementById('win-text').innerText += " Match Complete!";
+                } else {
+                    document.getElementById('btn-continue').style.display = 'inline-block';
+                }
+                
+                modal.style.display = 'flex';
             } else {
                 endTurnLogic();
             }
         }
+
+        window.continueGame = function() {
+            document.getElementById('win-modal').style.display = 'none';
+            nextTurn(); 
+        };
 
         function endTurnLogic() {
             if (gameData.diceValue === 6) {
@@ -882,7 +517,12 @@
         }
 
         function nextTurn() {
-            gameData.turnIndex = (gameData.turnIndex + 1) % gameData.players.length;
+            if (gameData.winners.length >= gameData.players.length - 1) return;
+
+            do {
+                gameData.turnIndex = (gameData.turnIndex + 1) % gameData.players.length;
+            } while (gameData.winners.includes(gameData.players[gameData.turnIndex]));
+
             gameData.state = 'waiting_for_roll';
             updateTurnIndicator();
         }
@@ -892,47 +532,34 @@
             const curPlayer = gameData.players[gameData.turnIndex];
             const isBot = gameData.roles[curPlayer] === 'bot';
 
-            const hexColors = {
-                'red': '#e74c3c', 'green': '#2ecc71',
-                'yellow': '#f1c40f', 'blue': '#3498db'
-            };
+            const hexColors = { 'red': '#e74c3c', 'green': '#2ecc71', 'yellow': '#f1c40f', 'blue': '#3498db' };
             
             document.body.style.backgroundColor = hexColors[curPlayer];
             document.querySelector('.game-container').style.backgroundColor = hexColors[curPlayer];
 
             let dice = document.getElementById('active-dice');
             const activeHome = document.querySelector(`.board-home.bg-${curPlayer}`);
-            
-            if(activeHome && dice) {
-                activeHome.appendChild(dice); 
-            }
+            if(activeHome && dice) activeHome.appendChild(dice); 
 
             if (isBot) {
-                dice.classList.add('disabled');
-                dice.classList.remove('ready');
+                dice.classList.add('disabled'); dice.classList.remove('ready');
                 if (gameData.state === 'waiting_for_roll') {
                     dice.innerHTML = '🤖';
                     setTimeout(() => window.rollDice(), 1000);
                 }
             } else {
-                dice.classList.remove('disabled');
-                dice.classList.add('ready');
-                if (gameData.state === 'waiting_for_roll') {
-                    dice.innerHTML = '🎲';
-                }
+                dice.classList.remove('disabled'); dice.classList.add('ready');
+                if (gameData.state === 'waiting_for_roll') { dice.innerHTML = '🎲'; }
             }
         }
 
         function updateBoardUI(animate = false) {
             ['red', 'green', 'yellow', 'blue'].forEach(color => {
                 gameData.tokens[color].forEach((pos, idx) => {
-                    
                     let token = document.getElementById(`token-${color}-${idx}`);
                     if (!token) {
-                        token = document.createElement('div');
-                        token.id = `token-${color}-${idx}`;
-                        token.className = `ludo-token bg-${color}`;
-                        token.onclick = () => handleTokenClick(color, idx);
+                        token = document.createElement('div'); token.id = `token-${color}-${idx}`;
+                        token.className = `ludo-token bg-${color}`; token.onclick = () => handleTokenClick(color, idx);
                     }
 
                     const canMove = checkValidMove(pos, gameData.diceValue);
@@ -944,42 +571,23 @@
                     }
 
                     let targetContainer;
-                    if (pos === -1) {
-                        targetContainer = document.getElementById(`home-${color}-${idx}`);
-                    } else if (pos >= 0 && pos <= 50) {
-                        let absPos = (startOffsets[color] + pos) % 52;
-                        targetContainer = mainTrack[absPos];
-                    } else if (pos >= 51 && pos <= 55) {
-                        let stretchIdx = pos - 51;
-                        targetContainer = stretches[color][stretchIdx];
-                    } else if (pos === 56) {
-                        targetContainer = document.getElementById('center-home');
-                    }
+                    if (pos === -1) targetContainer = document.getElementById(`home-${color}-${idx}`);
+                    else if (pos >= 0 && pos <= 50) targetContainer = mainTrack[(startOffsets[color] + pos) % 52];
+                    else if (pos >= 51 && pos <= 55) targetContainer = stretches[color][pos - 51];
+                    else if (pos === 56) targetContainer = document.getElementById('center-home');
 
                     if (targetContainer && token.parentElement !== targetContainer) {
                         if (animate && token.parentElement) {
-                            const first = token.getBoundingClientRect(); 
-                            targetContainer.appendChild(token);          
-                            const last = token.getBoundingClientRect();  
-
-                            const deltaX = first.left - last.left;
-                            const deltaY = first.top - last.top;
-
+                            const first = token.getBoundingClientRect(); targetContainer.appendChild(token); const last = token.getBoundingClientRect();  
+                            const deltaX = first.left - last.left; const deltaY = first.top - last.top;
                             if (first.width > 0 && (deltaX !== 0 || deltaY !== 0)) {
-                                token.style.transition = 'none';
-                                token.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-                                requestAnimationFrame(() => {
-                                    requestAnimationFrame(() => {
-                                        token.style.transition = 'transform 0.18s ease-in-out';
-                                        token.style.transform = 'translate(0, 0)';
-                                    });
-                                });
+                                token.style.transition = 'none'; token.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                                requestAnimationFrame(() => { requestAnimationFrame(() => {
+                                    token.style.transition = 'transform 0.18s ease-in-out'; token.style.transform = 'translate(0, 0)';
+                                }); });
                             }
                         } else {
-                            token.style.transition = 'none';
-                            token.style.transform = 'translate(0, 0)';
-                            targetContainer.appendChild(token);
+                            token.style.transition = 'none'; token.style.transform = 'translate(0, 0)'; targetContainer.appendChild(token);
                         }
                     }
                 });
