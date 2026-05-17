@@ -176,7 +176,23 @@
         @keyframes dicePulse { 0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); } 50% { transform: scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.5); } 100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); } }
 
         .ludo-token { width: 65%; height: 65%; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; z-index: 10; }
-        .path-cell .ludo-token { width: 14px; height: 14px; margin: 1px; border-width: 1px; }
+  /* Stack them in the dead center, then stagger them outwards */
+.path-cell .ludo-token { 
+    width: 14px; 
+    height: 14px; 
+    border-width: 1px;
+    position: absolute; 
+    transition: margin 0.2s ease; /* Smooth slide when a new piece joins the stack */
+}
+
+/* The eclipsed offset logic */
+.path-cell .ludo-token:nth-child(1) { margin: -6px 0 0 -6px; z-index: 1; }
+.path-cell .ludo-token:nth-child(2) { margin: -2px 0 0 -2px; z-index: 2; }
+.path-cell .ludo-token:nth-child(3) { margin: 2px 0 0 2px; z-index: 3; }
+.path-cell .ludo-token:nth-child(4) { margin: 6px 0 0 6px; z-index: 4; }
+/* Just in case a mega-stack happens */
+.path-cell .ludo-token:nth-child(5) { margin: 10px 0 0 10px; z-index: 5; }
+.path-cell .ludo-token:nth-child(6) { margin: 14px 0 0 14px; z-index: 6; }
         .center-finish .ludo-token { width: 15px; height: 15px; margin: 2px; }
         .playable { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 10px 4px #2c3e50; animation: tokenPulse 1s infinite; z-index: 100 !important; }
         @keyframes tokenPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
