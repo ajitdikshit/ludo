@@ -15,6 +15,9 @@
         
         /* 1. ANIMATED GLOBAL MENU BACKGROUND */
         body { 
+            overscroll-behavior-y: contain;
+            height: 100%;
+    overflow: hidden;
             background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
@@ -280,6 +283,14 @@
         </div>
 
     </div>
+    <script>
+        window.addEventListener('beforeunload', (event) => {
+    // Cancel the event as stated by the standard.
+    event.preventDefault();
+    // Older browsers require a returnValue to be set
+    event.returnValue = 'Are you sure you want to exit? Your game progress will be lost.';
+});
+    </script>
 
     <script>
         if ('serviceWorker' in navigator) {
