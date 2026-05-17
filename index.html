@@ -12,12 +12,26 @@
         
         /* --- CSS STYLING --- */
         * {transition: 0.5s; box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
-        
+        html, body {
+    /* 1. Prevent scroll chain up to the browser wrapper */
+    overscroll-behavior-y: none;
+    overscroll-behavior: none;
+
+    /* 2. Lock the dimensions perfectly to the mobile screen */
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    
+    /* 3. Hide any overflow causing the browser to think it can scroll */
+    overflow: hidden;
+    
+    /* 4. Fixes a glitch on iOS/Android PWA standalone wrappers */
+    position: fixed; 
+}
         /* 1. ANIMATED GLOBAL MENU BACKGROUND */
         body { 
-            overscroll-behavior-y: contain;
-            height: 100%;
-    overflow: hidden;
+          
             background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
