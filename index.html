@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c3e50">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ludo Playable Game UI</title>
@@ -169,18 +171,17 @@
         </div>
 
     </div>
-
     <script>
-        // --- AUDIO PRELOADER ---
+       
         const sounds = {
             dice: new Audio('dice.mp3'),
             move: new Audio('move.mp3'),
             win: new Audio('win.mp3'),
-            safe: new Audio('safe.mp3') // NEW SAFE SOUND ADDED
+            safe: new Audio('safe.mp3')
         };
         sounds.dice.volume = 1.0;
         sounds.move.volume = 0.1; 
-        sounds.safe.volume = 0.1; // Tweak this if it is too loud/quiet compared to move.mp3
+        sounds.safe.volume = 0.1;
 
         function preloadAudio() {
             const startBtn = document.getElementById('btn-main-start');
@@ -599,6 +600,19 @@
             generatePaths();
             preloadAudio();
         });
+    </script>
+    <script>
+        // Register the Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
