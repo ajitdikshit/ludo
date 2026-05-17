@@ -4,13 +4,13 @@ const CACHE_NAME = 'ludo-game-cache-v1';
 
 // List of all the files we want to save for offline use
 const urlsToCache = [
-    './',
-    './index.html',
-    './bots.js',
-    './dice.mp3',
-    './move.mp3',
-    './safe.mp3',
-    './win.mp3'
+    '/ludo',
+    '/ludo/index.html',
+    '/ludo/bots.js',
+    '/ludo/dice.mp3',
+    '/ludo/move.mp3',
+    '/ludo/safe.mp3',
+    '/ludo/win.mp3'
 ];
 
 // 1. Install Step: Download and cache all files

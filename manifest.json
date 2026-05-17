@@ -2,7 +2,7 @@
     "name": "Ludo Offline",
     "short_name": "Ludo",
     "description": "Play Ludo against friends or offline bots!",
-    "start_url": "./index.html",
+    "start_url": "/ludo/index.html",
     "display": "fullscreen",
     "background_color": "#f0f4f8",
     "theme_color": "#2c3e50",
