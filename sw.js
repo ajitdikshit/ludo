@@ -1,6 +1,5 @@
-const CACHE_NAME = "ludo-cache-v1";
+const CACHE_NAME = "ludo-cache-v2";
 
-// Hardcoded paths matching your repo name
 const FILES_TO_CACHE = [
   "/ludo/",
   "/ludo/index.html",
@@ -38,9 +37,8 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).catch(() => {
-        // Your awesome offline fallback logic
         if (event.request.mode === "navigate") {
-          return caches.match("/Ludo/index.html");
+          return caches.match("/ludo/index.html");
         }
       });
     })

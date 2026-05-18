@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ludo Playable Game UI</title>
     <script src="bots.js"></script>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/ludo/manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <style>
         
@@ -215,7 +215,7 @@
 
     <div class="game-container">
         
-        <div id="screen-main" class="screen active">
+       <div id="screen-main" class="screen active">
             <div class="menu-decor token-r"></div>
             <div class="menu-decor token-g"></div>
             <div class="menu-decor token-b"></div>
@@ -223,6 +223,8 @@
             
             <h1>LUDO</h1>
             <button id="btn-main-start" class="btn primary" disabled>Loading Sounds...</button>
+            
+            <button id="btn-install" class="btn secondary" disabled>Checking Install Status...</button>
         </div>
 
         <div id="screen-mode" class="screen">
@@ -962,6 +964,41 @@
                     .catch(err => console.log('ServiceWorker failed: ', err));
             });
         }
+        let deferredPrompt;
+        const installButton = document.getElementById('btn-install');
+
+        // 1. Catch the install prompt from Chrome
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome from showing the automatic mini-infobar
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            
+            // THE FIX: Change the text and enable the button ONLY when Chrome gives the green light!
+            installButton.innerText = '⬇ Install App';
+            installButton.disabled = false;
+            installButton.classList.add('primary'); // Make it pop visually
+            installButton.classList.remove('secondary');
+        });
+
+        // 2. What happens when the user clicks our button
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Show the official Chrome install prompt
+                deferredPrompt.prompt();
+                
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    installButton.style.display = 'none'; // Hide if successful
+                }
+                deferredPrompt = null;
+            } else {
+                // Diagnostic alert if they somehow click it without the prompt being ready
+                alert("Chrome is blocking the install. Make sure the app isn't already installed on your home screen or in your app drawer!");
+            }
+        });
     </script>
 </body>
 </html>
