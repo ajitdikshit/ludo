@@ -4,12 +4,6 @@ const CACHE_NAME = "ludo-cache-v1";
 const FILES_TO_CACHE = [
   "/ludo/",
   "/ludo/index.html",
-  "/ludo/bots.js",
-  "/ludo/dice.mp3",
-  "/ludo/move.mp3",
-  "/ludo/win.mp3",
-  "/ludo/safe.mp3",
-  "/ludo/beat.mp3",
   "/ludo/icon-192.png",
   "/ludo/icon-512.png"
 ];
