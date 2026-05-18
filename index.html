@@ -917,7 +917,39 @@
                 if (gameData.state === 'waiting_for_roll') { dice.innerHTML = '🎲'; }
             }
         }
+// --- LIVE PROGRESS PERCENTAGE CALCULATION ---
+        function updatePlayerProgress() {
+            ['red', 'green', 'yellow', 'blue'].forEach((color, idx) => {
+                if (gameData.players.includes(color)) {
+                    let totalSteps = 0;
+                    
+                    gameData.tokens[color].forEach(pos => {
+                        if (pos !== -1) {
+                            totalSteps += pos; // Add up current relative steps (0 to 56)
+                        }
+                    });
 
+                    // Max team progress is 4 tokens * 56 steps = 224
+                    let percentage = Math.round((totalSteps / 224) * 100);
+                    
+                    const lbl = document.getElementById(`label-${color}`);
+                    if (lbl) {
+                        // 1. Determine the correct base name (Player vs Bot)
+                        let baseName = gameData.roles[color] === 'bot' ? `Bot ${idx + 1}` : `Player ${idx + 1}`;
+                        
+                        // 2. Keep any win emojis if they have finished the match
+                        if (gameData.winners.includes(color)) {
+                            let rank = gameData.winners.indexOf(color) + 1;
+                            let suffix = rank === 1 ? "1st" : rank === 2 ? "2nd" : "3rd";
+                            lbl.innerText = `${baseName} 🥇 ${suffix} (${percentage}%)`;
+                        } else {
+                            // 3. Otherwise, just print the standard name with live progress
+                            lbl.innerText = `${baseName} (${percentage}%)`;
+                        }
+                    }
+                }
+            });
+        }
         function updateBoardUI(animate = false) {
             ['red', 'green', 'yellow', 'blue'].forEach(color => {
                 gameData.tokens[color].forEach((pos, idx) => {
@@ -958,6 +990,7 @@
                 });
             });
             updateTurnIndicator(); 
+            updatePlayerProgress();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
