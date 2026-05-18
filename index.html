@@ -337,13 +337,7 @@
     </script>
 
     <script>
-       if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/ludo/sw.js')
-                    .then(registration => console.log('ServiceWorker connected!'))
-                    .catch(err => console.log('ServiceWorker failed: ', err));
-            });
-        }
+      
 
         const sounds = {
             dice: new Audio('dice.mp3'),
@@ -959,6 +953,15 @@
             generatePaths();
             preloadAudio();
         });
+    </script>
+    <script>
+         if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/ludo/sw.js')
+                    .then(registration => console.log('ServiceWorker connected!'))
+                    .catch(err => console.log('ServiceWorker failed: ', err));
+            });
+        }
     </script>
 </body>
 </html>
