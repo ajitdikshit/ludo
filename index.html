@@ -107,6 +107,7 @@
         .player-label { font-weight: bold; font-size: 0.9rem; padding: 5px 12px; border-radius: 20px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); margin: 5px 0; display: none; width: fit-content; transition: all 0.3s; }
         .top-labels, .bottom-labels { display: flex; justify-content: space-between; width: 100%; padding: 0 10px; margin-bottom: 5px; margin-top: 5px; }
 
+        /* STRICT GRID PROTECTION: Fixed dimensions, no deshaping */
         .play-board { display: grid; grid-template-columns: 40% 20% 40%; grid-template-rows: 40% 20% 40%; width: 100%; aspect-ratio: 1 / 1; background: white; border: 2px solid #2c3e50; border-radius: 5px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .board-home { display: flex; justify-content: center; align-items: center; padding: 15%; border: 1px solid #bdc3c7; position: relative; }
         .home-inner { background: white; width: 100%; height: 100%; border-radius: 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10%; padding: 10%; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
@@ -310,10 +311,17 @@
 
     <script>
         const sounds = {
-            dice: new Audio('dice.mp3'), move: new Audio('move.mp3'), win: new Audio('win.mp3'), safe: new Audio('safe.mp3'), beat: new Audio('beat.mp3'), bgMusic: new Audio('background.mp3')   
+            dice: new Audio('dice.mp3'), 
+            move: new Audio('move.mp3'), 
+            win: new Audio('win.mp3'), 
+            safe: new Audio('safe.mp3'), 
+            beat: new Audio('beat.mp3'), 
+            home: new Audio('home.mp3'), // NEW HOME SOUND
+            bgMusic: new Audio('background.mp3')   
         };
+
         
-        sounds.move.volume = 0.2; sounds.safe.volume = 0.2; sounds.beat.volume = 0.2; sounds.bgMusic.loop = true; sounds.bgMusic.volume = 0.1; 
+        sounds.move.volume = 1.0; sounds.safe.volume = 1.0; sounds.beat.volume = 1.0; sounds.home.volume = 1.0; sounds.bgMusic.loop = true; sounds.bgMusic.volume = 0.5; 
 
         function preloadAudio() {
             const startBtn = document.getElementById('btn-main-start'); let isLoaded = false;
@@ -512,7 +520,12 @@
             } else {
                 if (currentPos === 56) {
                     const remainingTokens = gameData.tokens[color].filter(pos => pos < 56).length;
-                    if (remainingTokens > 0) gameData.earnedExtraRoll = true;
+                    if (remainingTokens > 0) {
+                        gameData.earnedExtraRoll = true;
+                        // NEW MECHANIC: PLAY HOME SOUND (Only if not the final token)
+                        sounds.home.currentTime = 0; 
+                        sounds.home.play().catch(e => {});
+                    }
                 }
                 let relativePos = gameData.tokens[color][tokenIndex];
                 if (relativePos >= 0 && relativePos <= 50) {
@@ -547,7 +560,7 @@
             if (!gameData.isActive) return;
             if (gameData.diceValue === 6 || gameData.earnedExtraRoll) {
                 gameData.earnedExtraRoll = false; gameData.state = 'waiting_for_roll'; saveGame();
-                updateBoardUI(false); // UPDATES PHANTOM STACKS FOR THE SAME PLAYER
+                updateBoardUI(false); 
                 const curPlayer = gameData.players[gameData.turnIndex]; const dice = document.getElementById('active-dice');
                 if (gameData.roles[curPlayer] === 'bot') { dice.innerHTML = '🤖'; setTimeout(() => { if (gameData.isActive) window.rollDice(); }, 250); } 
                 else { dice.innerHTML = '🎲'; dice.classList.remove('disabled'); dice.classList.add('ready'); }
@@ -560,7 +573,7 @@
             if (gameData.winners.length >= gameData.players.length - 1) { localStorage.removeItem('ludoSaveData'); return; }
             do { gameData.turnIndex = (gameData.turnIndex + 1) % gameData.players.length; } while (gameData.winners.includes(gameData.players[gameData.turnIndex]));
             gameData.state = 'waiting_for_roll'; gameData.turnStartTokens = JSON.parse(JSON.stringify(gameData.tokens)); 
-            updateBoardUI(false); // RE-ASSIGNS PHANTOM STACKS TO THE NEW PLAYER
+            updateBoardUI(false); 
             saveGame();
         }
 
@@ -592,7 +605,6 @@
 
         function updateBoardUI(animate = false) {
             
-            // 1. Wipe ghost classes ONLY if not actively stepping to prevent flickering
             if (!animate) {
                 document.querySelectorAll('.ludo-token').forEach(t => {
                     t.classList.remove('ghost-active');
@@ -600,7 +612,6 @@
                 });
             }
 
-            // 2. DOM Sorter: Pushes active player's tokens to the top ONLY if not stepping
             const activeColor = gameData.players[gameData.turnIndex];
             if (activeColor && !animate) {
                 gameData.tokens[activeColor].forEach((pos, idx) => {
@@ -611,7 +622,6 @@
                 });
             }
 
-            // 3. Move and Animate the Tokens
             ['red', 'green', 'yellow', 'blue'].forEach(color => {
                 gameData.tokens[color].forEach((pos, idx) => {
                     let token = document.getElementById(`token-${color}-${idx}`);
@@ -639,7 +649,6 @@
                 });
             }); 
             
-            // 4. THE PHANTOM STACK ENGINE: Only process if not currently stepping
             if (activeColor && !animate) {
                 document.querySelectorAll('.path-cell, .center-finish').forEach(cell => {
                     if (cell.children.length > 1) {
