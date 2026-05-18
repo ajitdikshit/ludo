@@ -1,58 +1,51 @@
-// sw.js - Service Worker for Offline Ludo
-
-const CACHE_NAME = 'ludo-game-cache-v1';
-
-// List of all the files we want to save for offline use
-const urlsToCache = [
-    '/ludo',
-    '/ludo/background.mp3',
-    '/ludo/beat.mp3',
-    '/ludo/index.html',
-    '/ludo/bots.js',
-    '/ludo/dice.mp3',
-    '/ludo/move.mp3',
-    '/ludo/safe.mp3',
-    '/ludo/win.mp3'
+const CACHE_NAME = 'ludo-cache-v1';
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './bots.js',
+  './dice.mp3',
+  './move.mp3',
+  './win.mp3',
+  './safe.mp3',
+  './beat.mp3',
+  './background.mp3',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-// 1. Install Step: Download and cache all files
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Opened cache, downloading files...');
-                return cache.addAll(urlsToCache);
-            })
-    );
+// Install Event: Cache all assets instantly
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+  self.skipWaiting();
 });
 
-// 2. Fetch Step: Intercept network requests and serve from cache if offline
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // If the file is in the cache, return it! 
-                if (response) {
-                    return response;
-                }
-                // Otherwise, fetch it from the internet normally
-                return fetch(event.request);
-            })
-    );
-});
-
-// 3. Activate Step: Clean up old caches if we update the CACHE_NAME version
-self.addEventListener('activate', event => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+// Activate Event: Clear out any old versions of the cache
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
         })
-    );
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// Fetch Event: Required by Chrome to pass PWA Install criteria
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // Return the cached version if it exists, otherwise fetch from the network
+      return cachedResponse || fetch(event.request);
+    })
+  );
 });
