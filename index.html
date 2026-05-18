@@ -13,34 +13,27 @@
         /* --- CSS STYLING --- */
         * {transition: 0.5s; box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
         html, body {
-    /* 1. Prevent scroll chain up to the browser wrapper */
-    overscroll-behavior-y: none;
-    overscroll-behavior: none;
+            /* Prevent scroll chain up to the browser wrapper */
+            overscroll-behavior-y: none;
+            overscroll-behavior: none;
 
-    /* 2. Lock the dimensions perfectly to the mobile screen */
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    
-    /* 3. Hide any overflow causing the browser to think it can scroll */
-    overflow: hidden;
-    
-    /* 4. Fixes a glitch on iOS/Android PWA standalone wrappers */
-    position: fixed; 
-}
-        /* 1. ANIMATED GLOBAL MENU BACKGROUND */
-        body { 
-          
-            background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+            /* Lock the dimensions perfectly to the mobile screen */
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            
+            /* Hide any overflow causing the browser to think it can scroll */
+            overflow: hidden;
+            
+            /* Fixes a glitch on iOS/Android PWA standalone wrappers */
+            position: fixed; 
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+
+        /* 1. STATIC GLOBAL BACKGROUND */
+        body { 
+            background-color: #2c3e50; /* A sleek solid navy blue */
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
         }
 
         .game-container { background: #ffffff; width: 100%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
@@ -48,11 +41,9 @@
 
         .screen { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 5%; text-align: center; position: relative; z-index: 10;}
         
-        /* Apply dynamic animated gradients across ALL menu setups explicitly */
+        /* Apply the static background across ALL menu setups explicitly */
         #screen-main, #screen-mode, #screen-players, #screen-board {
-            background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-color: #2c3e50;
         }
 
         /* 2. ELASTIC BOUNCE SCREEN TRANSITIONS */
@@ -172,27 +163,29 @@
         .dice-dot { width: 20%; height: 20%; background-color: #2c3e50; border-radius: 50%; position: absolute; box-shadow: inset 0 2px rgba(0,0,0,0.5); }
         
         @keyframes rollSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(360deg) scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.4); } 100% { transform: rotate(720deg) scale(1); } }
-        .rolling-animation { animation: rollSpin 0.4s ease-out !important; }
+        .rolling-animation { animation: rollSpin 0.2s ease-out !important; }
         @keyframes dicePulse { 0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); } 50% { transform: scale(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.5); } 100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); } }
 
         .ludo-token { width: 65%; height: 65%; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer; z-index: 10; }
-  /* Stack them in the dead center, then stagger them outwards */
-.path-cell .ludo-token { 
-    width: 14px; 
-    height: 14px; 
-    border-width: 1px;
-    position: absolute; 
-    transition: margin 0.2s ease; /* Smooth slide when a new piece joins the stack */
-}
+        
+        /* Stack them in the dead center, then stagger them outwards */
+        .path-cell .ludo-token { 
+            width: 14px; 
+            height: 14px; 
+            border-width: 1px;
+            position: absolute; 
+            transition: margin 0.2s ease; /* Smooth slide when a new piece joins the stack */
+        }
 
-/* The eclipsed offset logic */
-.path-cell .ludo-token:nth-child(1) { margin: -6px 0 0 -6px; z-index: 1; }
-.path-cell .ludo-token:nth-child(2) { margin: -2px 0 0 -2px; z-index: 2; }
-.path-cell .ludo-token:nth-child(3) { margin: 2px 0 0 2px; z-index: 3; }
-.path-cell .ludo-token:nth-child(4) { margin: 6px 0 0 6px; z-index: 4; }
-/* Just in case a mega-stack happens */
-.path-cell .ludo-token:nth-child(5) { margin: 10px 0 0 10px; z-index: 5; }
-.path-cell .ludo-token:nth-child(6) { margin: 14px 0 0 14px; z-index: 6; }
+        /* The eclipsed offset logic */
+        .path-cell .ludo-token:nth-child(1) { margin: -6px 0 0 -6px; z-index: 1; }
+        .path-cell .ludo-token:nth-child(2) { margin: -2px 0 0 -2px; z-index: 2; }
+        .path-cell .ludo-token:nth-child(3) { margin: 2px 0 0 2px; z-index: 3; }
+        .path-cell .ludo-token:nth-child(4) { margin: 6px 0 0 6px; z-index: 4; }
+        /* Just in case a mega-stack happens */
+        .path-cell .ludo-token:nth-child(5) { margin: 10px 0 0 10px; z-index: 5; }
+        .path-cell .ludo-token:nth-child(6) { margin: 14px 0 0 14px; z-index: 6; }
+        
         .center-finish .ludo-token { width: 15px; height: 15px; margin: 2px; }
         .playable { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 10px 4px #2c3e50; animation: tokenPulse 1s infinite; z-index: 100 !important; }
         @keyframes tokenPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
@@ -205,6 +198,9 @@
         
         #exit-modal .modal-box { border-color: #e74c3c; }
         #exit-modal h2 { color: #e74c3c; font-size: 1.8rem; }
+        
+        #resume-modal .modal-box { border-color: #fdbb2d; }
+        #resume-modal h2 { color: #fdbb2d; font-size: 2.0rem; }
     </style>
 </head>
 <body>
@@ -295,8 +291,8 @@
                 <p id="win-text">Red has finished 1st!</p>
                 <div class="button-group">
                     <button id="btn-continue" class="btn primary" onclick="window.continueGame()">Continue Match</button>
-                    <button class="btn" onclick="window.switchScreen('screen-mode')">New Game</button>
-                    <button class="btn secondary" onclick="window.switchScreen('screen-main')">Exit to Menu</button>
+                    <button class="btn" onclick="window.newGameFromWin()">New Game</button>
+                    <button class="btn secondary" onclick="window.exitToMenu()">Exit to Menu</button>
                 </div>
             </div>
         </div>
@@ -311,15 +307,25 @@
                 </div>
             </div>
         </div>
+        
+        <div id="resume-modal" class="modal-overlay">
+            <div class="modal-box">
+                <h2>Game Found!</h2>
+                <p>You have an unfinished game. Do you want to resume?</p>
+                <div class="action-buttons">
+                    <button class="btn primary" onclick="window.resumeGame()">Resume</button>
+                    <button class="btn secondary" onclick="window.discardSaveAndStartNew()">Start Fresh</button>
+                </div>
+            </div>
+        </div>
 
     </div>
+    
     <script>
         window.addEventListener('beforeunload', (event) => {
-    // Cancel the event as stated by the standard.
-    event.preventDefault();
-    // Older browsers require a returnValue to be set
-    event.returnValue = 'Are you sure you want to exit? Your game progress will be lost.';
-});
+            event.preventDefault();
+            event.returnValue = 'Are you sure you want to exit? Your game progress will be lost.';
+        });
     </script>
 
     <script>
@@ -343,6 +349,7 @@
         sounds.move.volume = 0.2; 
         sounds.safe.volume = 0.2; 
         sounds.beat.volume = 0.2; 
+        sounds.win.volume = 0.2;
         
         sounds.bgMusic.loop = true; 
         sounds.bgMusic.volume = 0.1; 
@@ -357,8 +364,7 @@
                 startBtn.innerText = "Start Game";
                 
                 startBtn.onclick = () => {
-                    sounds.bgMusic.play().catch(e => console.log("BGM autoplay blocked"));
-                    window.switchScreen('screen-mode');
+                    window.checkResumeGame();
                 };
             };
 
@@ -375,6 +381,7 @@
         }
 
         const gameData = {
+            isActive: false, 
             players: [], 
             roles: {}, 
             winners: [], 
@@ -388,14 +395,80 @@
                 green: [-1, -1, -1, -1],
                 yellow: [-1, -1, -1, -1],
                 blue: [-1, -1, -1, -1]
-            }
+            },
+            turnStartTokens: null 
         };
 
         let mainTrack = [];
         let stretches = { red: [], green: [], yellow: [], blue: [] };
         const startOffsets = { red: 1, green: 14, yellow: 27, blue: 40 };
         const safeSpots = [1, 9, 14, 22, 27, 35, 40, 48];
+        
+        /* --- CORE LOCAL STORAGE LOGIC --- */
+        function saveGame() {
+            if (gameData.isActive) {
+                localStorage.setItem('ludoSaveData', JSON.stringify(gameData));
+            }
+        }
 
+        window.checkResumeGame = function() {
+            sounds.bgMusic.play().catch(e => console.log("BGM autoplay blocked"));
+            const savedData = localStorage.getItem('ludoSaveData');
+            if (savedData) {
+                document.getElementById('resume-modal').style.display = 'flex';
+            } else {
+                window.switchScreen('screen-mode');
+            }
+        };
+
+       window.resumeGame = function() {
+            document.getElementById('resume-modal').style.display = 'none';
+            const savedData = localStorage.getItem('ludoSaveData');
+            if (savedData) {
+                Object.assign(gameData, JSON.parse(savedData));
+                gameData.isActive = true;
+
+                /* FIX: RE-MAP THE BOARD SO THE TRACK ARRAYS EXIST! */
+                mapBoardLogic();
+
+                // Clear existing DOM tokens before redrawing
+                document.querySelectorAll('.ludo-token').forEach(t => t.remove());
+
+                // Force the dice to be visible again!
+                let dice = document.getElementById('active-dice');
+                dice.style.display = 'flex';
+
+                // Ensure the dice shows the correct icon or rolled number from the save
+                if (gameData.state === 'waiting_for_roll') {
+                    dice.innerHTML = '🎲';
+                    dice.classList.remove('disabled', 'rolling-animation');
+                    dice.classList.add('ready');
+                } else if (gameData.diceValue > 0) {
+                    dice.innerHTML = renderDiceDots(gameData.diceValue);
+                    dice.classList.add('disabled');
+                    dice.classList.remove('ready');
+                }
+
+                window.switchScreen('screen-game');
+                updateBoardUI(false);
+
+                // If the saved state was waiting for a bot, trigger it
+                const curPlayer = gameData.players[gameData.turnIndex];
+                if (gameData.roles[curPlayer] === 'bot' && gameData.state === 'waiting_for_roll') {
+                     setTimeout(() => { if (gameData.isActive) window.rollDice(); }, 500);
+                }
+            } else {
+                window.switchScreen('screen-mode');
+            }
+        };
+
+        window.discardSaveAndStartNew = function() {
+            localStorage.removeItem('ludoSaveData');
+            document.getElementById('resume-modal').style.display = 'none';
+            window.switchScreen('screen-mode');
+        };
+
+        /* --- SCREEN CONTROLS --- */
         window.switchScreen = function(screenId) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             const targetScreen = document.getElementById(screenId);
@@ -406,6 +479,7 @@
                 document.querySelector('.game-container').style.backgroundColor = 'white';
                 document.getElementById('win-modal').style.display = 'none';
                 document.getElementById('exit-modal').style.display = 'none';
+                document.getElementById('resume-modal').style.display = 'none';
                 
                 sounds.bgMusic.play().catch(e => {}); 
             } else {
@@ -422,8 +496,22 @@
         };
 
         window.confirmExit = function() {
+            gameData.isActive = false; 
+            localStorage.removeItem('ludoSaveData'); /* Clear save on explicit quit */
             document.getElementById('exit-modal').style.display = 'none';
             window.switchScreen('screen-main');
+        };
+        
+        window.exitToMenu = function() {
+            gameData.isActive = false;
+            localStorage.removeItem('ludoSaveData');
+            window.switchScreen('screen-main');
+        };
+        
+        window.newGameFromWin = function() {
+            gameData.isActive = false;
+            localStorage.removeItem('ludoSaveData');
+            window.switchScreen('screen-mode');
         };
 
         window.startBotGame = function() {
@@ -485,9 +573,13 @@
         }
 
         function initGameVisuals() {
+            // Clean up existing DOM tokens to prevent duplicates on fresh start
+            document.querySelectorAll('.ludo-token').forEach(t => t.remove());
+            
             generatePaths();
             mapBoardLogic();
             
+            gameData.isActive = true; 
             gameData.turnIndex = 0;
             gameData.state = 'waiting_for_roll';
             gameData.diceValue = 0;
@@ -512,7 +604,10 @@
                 lbl.innerText = gameData.roles[c] === 'bot' ? `Bot ${idx+1}` : `Player ${idx+1}`;
             });
 
+            gameData.turnStartTokens = JSON.parse(JSON.stringify(gameData.tokens)); 
+
             updateBoardUI(false); 
+            saveGame();
         }
 
         function renderDiceDots(num) {
@@ -526,7 +621,7 @@
         }
 
         window.rollDice = function() {
-            if (gameData.state !== 'waiting_for_roll') return;
+            if (!gameData.isActive || gameData.state !== 'waiting_for_roll') return;
             
             const curPlayer = gameData.players[gameData.turnIndex];
             const dice = document.getElementById('active-dice');
@@ -540,6 +635,7 @@
             sounds.dice.play().catch(e => {});
 
             setTimeout(() => {
+                if (!gameData.isActive) return; 
                 dice.classList.remove('rolling-animation'); 
                 
                 const allLocked = gameData.tokens[curPlayer].every(pos => pos === -1);
@@ -562,10 +658,17 @@
                     if (gameData.consecutiveSixes === 3) {
                         gameData.consecutiveSixes = 0; 
                         
+                        /* REVERT ALL MOVES MADE THIS TURN */
+                        gameData.tokens = JSON.parse(JSON.stringify(gameData.turnStartTokens));
+                        updateBoardUI(false); 
+                        saveGame();
+                        
                         setTimeout(() => {
+                            if (!gameData.isActive) return;
                             dice.innerHTML = '❌'; 
                             dice.style.color = '#e74c3c'; 
                             setTimeout(() => {
+                                if (!gameData.isActive) return;
                                 dice.style.color = '#2c3e50'; 
                                 nextTurn();
                             }, 800);
@@ -586,19 +689,21 @@
                 } else {
                     gameData.state = 'waiting_for_move';
                     updateBoardUI(false); 
+                    saveGame();
 
                     if (gameData.roles[curPlayer] === 'bot') {
                         setTimeout(() => {
+                            if (!gameData.isActive) return;
                             if (typeof LudoBot !== 'undefined') {
                                 const bestIdx = LudoBot.getBestMove(gameData, curPlayer, gameData.diceValue, safeSpots, startOffsets);
                                 if (bestIdx !== -1) handleTokenClick(curPlayer, bestIdx, true);
                             } else {
                                 handleTokenClick(curPlayer, validMoves[0], true);
                             }
-                        }, 1200); 
+                        }, 200); 
                     } else {
                         if (validMoves.length === 1) {
-                            setTimeout(() => { handleTokenClick(curPlayer, validMoves[0]); }, 500);
+                            setTimeout(() => { if(gameData.isActive) handleTokenClick(curPlayer, validMoves[0]); }, 500);
                         }
                     }
                 }
@@ -612,7 +717,7 @@
         }
 
         function handleTokenClick(color, tokenIndex, isBotBypass = false) {
-            if (gameData.state !== 'waiting_for_move') return;
+            if (!gameData.isActive || gameData.state !== 'waiting_for_move') return;
             if (color !== gameData.players[gameData.turnIndex]) return;
             if (gameData.roles[color] === 'bot' && !isBotBypass) return;
 
@@ -626,10 +731,11 @@
                 sounds.move.currentTime = 0; sounds.move.play().catch(e => {});
                 gameData.tokens[color][tokenIndex] = 0; 
                 updateBoardUI(true);
-                setTimeout(() => finalizeMove(color, tokenIndex), 300);
+                setTimeout(() => { if (gameData.isActive) finalizeMove(color, tokenIndex); }, 300);
             } else {
                 let stepsLeft = gameData.diceValue;
                 function step() {
+                    if (!gameData.isActive) return; 
                     if (stepsLeft === 0) { finalizeMove(color, tokenIndex); return; }
                     sounds.move.currentTime = 0; sounds.move.play().catch(e => {});
                     gameData.tokens[color][tokenIndex]++; stepsLeft--;
@@ -659,19 +765,22 @@
         }
 
         function finalizeMove(color, tokenIndex) {
+            if (!gameData.isActive) return;
             let captures = getCaptures(color, tokenIndex);
             
             if (captures.length > 0) {
                 gameData.earnedExtraRoll = true; 
                 
                 setTimeout(() => {
+                    if (!gameData.isActive) return;
                     captures.forEach(c => gameData.tokens[c.color][c.index] = -1);
                     
                     sounds.beat.currentTime = 0; 
                     sounds.beat.play().catch(e => {});
                     
                     updateBoardUI(true); 
-                    setTimeout(() => checkWinCondition(color), 600); 
+                    saveGame();
+                    setTimeout(() => { if(gameData.isActive) checkWinCondition(color); }, 600); 
                 }, 200);
             } else {
                 let relativePos = gameData.tokens[color][tokenIndex];
@@ -682,11 +791,13 @@
                         sounds.safe.play().catch(e => {});
                     }
                 }
+                saveGame();
                 checkWinCondition(color);
             }
         }
 
         function checkWinCondition(color) {
+            if (!gameData.isActive) return;
             const hasWon = gameData.tokens[color].every(pos => pos === 56);
             
             if (hasWon && !gameData.winners.includes(color)) {
@@ -708,8 +819,10 @@
                 if (playersRemaining <= 1) {
                     document.getElementById('btn-continue').style.display = 'none'; 
                     document.getElementById('win-text').innerText += " Match Complete!";
+                    localStorage.removeItem('ludoSaveData'); /* Clear save if game finishes */
                 } else {
                     document.getElementById('btn-continue').style.display = 'inline-block';
+                    saveGame();
                 }
                 
                 modal.style.display = 'flex';
@@ -724,16 +837,18 @@
         };
 
         function endTurnLogic() {
+            if (!gameData.isActive) return;
             if (gameData.diceValue === 6 || gameData.earnedExtraRoll) {
                 gameData.earnedExtraRoll = false; 
                 gameData.state = 'waiting_for_roll';
+                saveGame();
                 
                 const curPlayer = gameData.players[gameData.turnIndex];
                 const dice = document.getElementById('active-dice');
 
                 if (gameData.roles[curPlayer] === 'bot') {
                     dice.innerHTML = '🤖';
-                    setTimeout(() => window.rollDice(), 1000);
+                    setTimeout(() => { if (gameData.isActive) window.rollDice(); }, 300);
                 } else {
                     dice.innerHTML = '🎲';
                     dice.classList.remove('disabled');
@@ -745,21 +860,30 @@
         }
 
         function nextTurn() {
+            if (!gameData.isActive) return;
             gameData.consecutiveSixes = 0; 
             gameData.earnedExtraRoll = false;
             
-            if (gameData.winners.length >= gameData.players.length - 1) return;
+            if (gameData.winners.length >= gameData.players.length - 1) {
+                localStorage.removeItem('ludoSaveData');
+                return;
+            }
 
             do {
                 gameData.turnIndex = (gameData.turnIndex + 1) % gameData.players.length;
             } while (gameData.winners.includes(gameData.players[gameData.turnIndex]));
 
             gameData.state = 'waiting_for_roll';
+            
+            /* SAVE STATE FOR NEW TURN */
+            gameData.turnStartTokens = JSON.parse(JSON.stringify(gameData.tokens)); 
+            
             updateTurnIndicator();
+            saveGame();
         }
 
         function updateTurnIndicator() {
-            if (!gameData.players.length) return;
+            if (!gameData.isActive || !gameData.players.length) return;
             const curPlayer = gameData.players[gameData.turnIndex];
             const isBot = gameData.roles[curPlayer] === 'bot';
 
@@ -776,7 +900,7 @@
                 dice.classList.add('disabled'); dice.classList.remove('ready');
                 if (gameData.state === 'waiting_for_roll') {
                     dice.innerHTML = '🤖';
-                    setTimeout(() => window.rollDice(), 1000);
+                    setTimeout(() => { if (gameData.isActive) window.rollDice(); }, 300); 
                 }
             } else {
                 dice.classList.remove('disabled'); dice.classList.add('ready');
