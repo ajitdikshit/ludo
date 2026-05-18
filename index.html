@@ -36,7 +36,13 @@
             display: flex; justify-content: center; align-items: center; min-height: 100vh; 
         }
 
-        .game-container { background: #ffffff; width: 100%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .game-container {-webkit-user-select: none; /* Safari/Chrome iOS/Android */
+    -moz-user-select: none;    /* Firefox Mobile */
+    -ms-user-select: none;     /* IE/Edge */
+    user-select: none;         /* Standard */
+
+    /* Disables the long-press popups and context menus on mobile */
+    -webkit-touch-callout: none; background: #ffffff; width: 100%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         @media (min-width: 600px) { .game-container { max-width: 500px; height: 800px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 4px solid rgba(255,255,255,0.2); } }
 
         .screen { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 5%; text-align: center; position: relative; z-index: 10;}
