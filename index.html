@@ -339,7 +339,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
+                navigator.serviceWorker.register('/ludo/sw.js')
                     .then(registration => console.log('ServiceWorker connected!'))
                     .catch(err => console.log('ServiceWorker failed: ', err));
             });
