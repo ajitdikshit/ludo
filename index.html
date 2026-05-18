@@ -458,6 +458,16 @@
                 }
                 
                 window.switchScreen('screen-game');
+                // FIX: Unhide and configure the player name labels when resuming a save state
+                ['red', 'green', 'yellow', 'blue'].forEach((color, idx) => {
+                    const lbl = document.getElementById(`label-${color}`);
+                    if (gameData.players.includes(color)) {
+                        lbl.style.display = 'block';
+                        lbl.innerText = gameData.roles[color] === 'bot' ? `Bot ${idx+1}` : `Player ${idx+1}`;
+                    } else {
+                        lbl.style.display = 'none';
+                    }
+                });
                 updateBoardUI(false);
                 
                 const curPlayer = gameData.players[gameData.turnIndex];
