@@ -328,7 +328,16 @@
                 </div>
             </div>
         </div>
-
+        <div id="pause-modal" class="modal-overlay">
+            <div class="modal-box" style="border-color: #3498db;">
+                <h2 style="color: #3498db;">Game Paused</h2>
+                <p>You left the app. Ready to resume?</p>
+                <div class="button-group">
+                    <button class="btn primary" onclick="window.resumeFromPause()">Continue Game</button>
+                    <button class="btn secondary" onclick="window.exitToMenuFromPause()">Quit to Menu</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -999,6 +1008,43 @@
                 alert("Chrome is blocking the install. Make sure the app isn't already installed on your home screen or in your app drawer!");
             }
         });
+        // --- PAGE VISIBILITY (BACKGROUND APP DETECTION) ---
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                // The user just pressed the Home button or switched apps
+                
+                // 1. Instantly kill the menu music if it was playing
+                sounds.bgMusic.pause();
+
+                // 2. Check if they are currently in an active match
+                const inGameScreen = document.getElementById('screen-game').classList.contains('active');
+                if (gameData.isActive && inGameScreen) {
+                    // Throw up the Pause screen so they can't accidentally click things when they return
+                    document.getElementById('pause-modal').style.display = 'flex';
+                }
+
+            } else if (document.visibilityState === 'visible') {
+                // The user just opened the app back up
+                
+                // 1. Check if they are in the menus (NOT in a game)
+                const inGameScreen = document.getElementById('screen-game').classList.contains('active');
+                
+                if (!inGameScreen) {
+                    // Resume the menu music only if they are in the menus
+                    sounds.bgMusic.play().catch(e => console.log("Audio blocked until interaction"));
+                }
+            }
+        });
+
+        // --- PAUSE MENU CONTROLS ---
+        window.resumeFromPause = function() {
+            document.getElementById('pause-modal').style.display = 'none';
+        };
+
+        window.exitToMenuFromPause = function() {
+            document.getElementById('pause-modal').style.display = 'none';
+            window.exitToMenu(); // Uses your existing exit function to clean up
+        };
     </script>
 </body>
 </html>
