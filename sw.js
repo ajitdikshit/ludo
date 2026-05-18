@@ -8,7 +8,6 @@ const ASSETS_TO_CACHE = [
   './win.mp3',
   './safe.mp3',
   './beat.mp3',
-  './background.mp3',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
