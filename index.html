@@ -793,6 +793,8 @@
 
         function finalizeMove(color, tokenIndex) {
             if (!gameData.isActive) return;
+            
+            let currentPos = gameData.tokens[color][tokenIndex];
             let captures = getCaptures(color, tokenIndex);
             
             if (captures.length > 0) {
@@ -810,6 +812,17 @@
                     setTimeout(() => { if(gameData.isActive) checkWinCondition(color); }, 600); 
                 }, 200);
             } else {
+                // --- NEW MECHANIC: EXTRA ROLL ON REACHING HOME (BUT NOT LAST TOKEN) ---
+                if (currentPos === 56) {
+                    // Count how many of this player's tokens have NOT reached home yet
+                    const remainingTokens = gameData.tokens[color].filter(pos => pos < 56).length;
+                    
+                    if (remainingTokens > 0) {
+                        // The player still has active pieces on the board; grant an extra roll!
+                        gameData.earnedExtraRoll = true;
+                    }
+                }
+
                 let relativePos = gameData.tokens[color][tokenIndex];
                 if (relativePos >= 0 && relativePos <= 50) {
                     let absPos = (startOffsets[color] + relativePos) % 52;
