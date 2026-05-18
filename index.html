@@ -128,10 +128,10 @@
         
         /* 6. FLOATING DECORATIONS FOR MAIN MENU */
         .menu-decor { position: absolute; width: 40px; height: 40px; border-radius: 50%; border: 4px solid white; box-shadow: 0 6px 15px rgba(0,0,0,0.3); opacity: 0.8; animation: floatDecor 6s ease-in-out infinite; z-index: 1; }
-        .token-r { background: #e74c3c; top: 15%; left: 10%; animation-delay: 0s; }
-        .token-g { background: #2ecc71; top: 12%; right: 12%; animation-delay: 1.5s; }
-        .token-b { background: #3498db; bottom: 25%; left: 15%; animation-delay: 3s; }
-        .token-y { background: #f1c40f; bottom: 20%; right: 10%; animation-delay: 4.5s; }
+        .token-r {transform: translate3d(0,0,0); will-change: transform; background: #e74c3c; top: 15%; left: 10%; animation-delay: 0s; }
+        .token-g {transform: translate3d(0,0,0); will-change: transform; background: #2ecc71; top: 12%; right: 12%; animation-delay: 1.5s; }
+        .token-b {transform: translate3d(0,0,0); will-change: transform; background: #3498db; bottom: 25%; left: 15%; animation-delay: 3s; }
+        .token-y {transform: translate3d(0,0,0); will-change: transform; background: #f1c40f; bottom: 20%; right: 10%; animation-delay: 4.5s; }
         @keyframes floatDecor { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-25px) rotate(15deg); } }
 
         /* --- DO NOT TOUCH: GAME BOARD UI --- */
